@@ -9,3 +9,5 @@ All third-party companies shown have no affiliation with the VA, Rocket Mortgage
 Built with vanilla HTML, CSS, and JavaScript. No frameworks or external dependencies.
 
 Competiscan Panelist id:  11348-13-41
+
+**Credit to Competiscan.com and their services, along with Claude.ai
