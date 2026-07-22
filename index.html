@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mortgage Mailbox Project</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f4f5f8;--surface:#ffffff;--surface2:#eceef4;--border:#d0d4e0;
+--text:#111318;--text2:#4a5068;--text3:#8a90a8;
+--accent:#c0392b;--irrrl:#c0392b;--vaclaim:#c06000;--cashout:#6c2f8a;--heloc:#1a6090;--other:#1e7a40;
+--rocket-flag:#b07000;
+}
+
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;overflow-x:hidden}
+.hero{padding:60px 40px 40px;max-width:960px;margin:0 auto}
+.hero-eyebrow{font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.hero-title{font-size:clamp(42px,7vw,80px);font-weight:800;line-height:1.0;margin-bottom:20px;letter-spacing:-.03em}
+.hero-title em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:15px;color:var(--text2);line-height:1.65;max-width:640px;margin-bottom:36px}
+.stat-row{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:32px}
+.stat-num{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.divider{width:1px;background:var(--border);align-self:stretch}
+.explainer{max-width:960px;margin:0 auto 12px;padding:0 40px}
+.explainer-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--rocket-flag);border-radius:10px;padding:20px 24px}
+.explainer-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--rocket-flag);margin-bottom:10px}
+.explainer-body{font-size:14px;color:var(--text2);line-height:1.7}
+.explainer-body strong{color:var(--text);font-weight:600}
+.explainer-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.explainer-col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:var(--text3)}
+.explainer-list{list-style:none;font-size:13px;color:var(--text2);line-height:1.8}
+.explainer-list li::before{content:"→ ";color:var(--rocket-flag);font-weight:600}
+.rocket-flag-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--rocket-flag);background:rgba(176,112,0,.10);border:1px solid rgba(176,112,0,.25);border-radius:4px;padding:2px 7px;margin-bottom:6px}
+.rocket-flag-badge::before{content:"⚠ "}
+.controls{max-width:960px;margin:24px auto 8px;padding:0 40px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.filter-btn{border:1px solid var(--border);background:transparent;color:var(--text2);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.filter-btn:hover{border-color:var(--text3);color:var(--text)}
+.filter-btn.active{color:#fff;border-color:transparent}
+.filter-btn[data-cat="all"].active{background:#d0d4e4;color:var(--text)}
+.filter-btn[data-cat="VA IRRRL"].active{background:var(--irrrl)}
+.filter-btn[data-cat="VA Benefits Claim"].active{background:var(--vaclaim)}
+.filter-btn[data-cat="Cash-Out Refi"].active{background:var(--cashout)}
+.filter-btn[data-cat="HELOC"].active{background:var(--heloc)}
+.filter-btn[data-cat="Other"].active{background:var(--other)}
+.filter-btn[data-cat="rocket"].active{background:var(--rocket-flag);color:#000}
+.filter-btn[data-cat="check"].active{background:#e74c3c}
+.filter-btn[data-cat="fabricated"].active{background:#9b59b6}
+.filter-btn[data-cat="govtimp"].active{background:#16a085}
+.filter-btn[data-cat="falseaff"].active{background:#c0392b}
+.timeline-wrap{max-width:960px;margin:0 auto;padding:0 40px 40px}
+.month-group{margin-bottom:8px}
+.month-header{display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-top:28px}
+.month-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.month-line{flex:1;height:1px;background:var(--border)}
+.month-count{font-size:11px;color:var(--text3);white-space:nowrap}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.mailer-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
+.mailer-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:10px 0 0 10px}
+.mailer-card[data-cat="VA IRRRL"]::before{background:var(--irrrl)}
+.mailer-card[data-cat="VA Benefits Claim"]::before{background:var(--vaclaim)}
+.mailer-card[data-cat="Cash-Out Refi"]::before{background:var(--cashout)}
+.mailer-card[data-cat="HELOC"]::before{background:var(--heloc)}
+.mailer-card[data-cat="Credit Card"]::before,.mailer-card[data-cat="Debt Consolidation"]::before{background:var(--other)}
+.mailer-card.names-rocket{border-color:rgba(176,112,0,.3)}
+.mailer-card.names-rocket:hover{border-color:rgba(176,112,0,.6);background:var(--surface2)}
+.mailer-card:not(.names-rocket):hover{border-color:#b0b8cc;background:var(--surface2)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;gap:8px}
+.card-company{font-size:14px;font-weight:600;line-height:1.3;flex:1}
+.card-day{font-size:11px;color:var(--text3);white-space:nowrap;padding-top:1px}
+.card-cat{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-bottom:7px}
+[data-cat="VA IRRRL"] .card-cat{background:rgba(192,57,43,.12);color:#a02020}
+[data-cat="VA Benefits Claim"] .card-cat{background:rgba(192,96,0,.12);color:#904000}
+[data-cat="Cash-Out Refi"] .card-cat{background:rgba(108,47,138,.12);color:#5a1a7a}
+[data-cat="HELOC"] .card-cat{background:rgba(26,96,144,.12);color:#1a4a7a}
+[data-cat="Credit Card"] .card-cat,[data-cat="Debt Consolidation"] .card-cat{background:rgba(30,122,64,.12);color:#1a5a30}
+.deception-flags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+.dflag{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:3px;line-height:1.4}
+.dflag-check{background:rgba(192,57,43,.12);color:#a02020}
+.dflag-fabricated{background:rgba(108,47,138,.12);color:#5a1a7a}
+.dflag-govtimp{background:rgba(22,120,100,.12);color:#0a5a4a}
+.dflag-falseaff{background:rgba(160,32,32,.12);color:#801010}
+.dflag-printop{background:rgba(176,112,0,.12);color:#705000}
+.card-headline{font-size:13px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-headline.expanded{display:block;-webkit-line-clamp:unset}
+.card-actions{display:flex;align-items:center;gap:10px;margin-top:8px}
+.card-expand{font-size:11px;color:#2a5a9a;cursor:pointer;background:none;border:none;padding:0;text-decoration:underline}
+.card-pdf{font-size:11px;color:#1a7a3a;cursor:pointer;background:none;border:none;padding:0;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.card-pdf:hover{color:#0a5a20}
+.legend{display:flex;gap:16px;flex-wrap:wrap;max-width:960px;margin:0 auto 8px;padding:0 40px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox-inner{background:var(--surface);border-radius:12px;width:90%;max-width:900px;height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.lightbox-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.lightbox-title{font-size:13px;font-weight:600;color:var(--text)}
+.lightbox-actions{display:flex;gap:10px;align-items:center}
+.lightbox-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:0;line-height:1}
+.lightbox-close:hover{color:var(--text)}
+.lightbox-open-btn{font-size:11px;color:#4a6fa8;background:none;border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;text-decoration:none}
+.lightbox-open-btn:hover{background:var(--surface2)}
+.lightbox-frame{flex:1;border:none;background:#fff}
+.findings{max-width:960px;margin:0 auto;padding:0 40px 80px}
+.findings-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid #2a7a50;border-radius:10px;padding:24px 28px}
+.findings-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a9a6a;margin-bottom:20px}
+.finding-item{display:flex;gap:16px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.finding-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.finding-num{font-size:22px;font-weight:800;color:#2a3a2a;line-height:1;flex-shrink:0;width:32px}
+.finding-body{}
+.finding-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5a9a6a;margin-bottom:4px}
+.finding-text{font-size:13px;color:var(--text2);line-height:1.65}
+.finding-text strong{color:var(--text);font-weight:600}
+.footer-note{max-width:960px;margin:0 auto;padding:24px 40px 60px;font-size:12px;color:var(--text3);line-height:1.7;border-top:1px solid var(--border)}
+.hero-provenance{font-size:13px;color:var(--text3);line-height:1.7;max-width:680px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+@media(max-width:600px){.hero,.controls,.timeline-wrap,.legend,.footer-note,.explainer,.findings{padding-left:20px;padding-right:20px}.stat-row{gap:16px}.stat-num{font-size:28px}.explainer-cols{grid-template-columns:1fr}.lightbox-inner{width:98%;height:92vh}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">One veteran. One VA purchase loan. One year of mail.</div>
+  <h1 class="hero-title">The Mortgage<br>Mailbox <em>Project</em></h1>
+  <p class="hero-sub">A single borrower closed a VA purchase loan with Rocket Mortgage on January 7, 2025. What followed was 49 solicitations from 24 different companies in the first 10 months — most designed to imply VA program affiliation, government authority, or a direct relationship with the borrower's actual lender.</p>
+  <div class="stat-row">
+    <div><div class="stat-num" id="stat-total">49</div><div class="stat-label">Total mailers</div></div>
+    <div class="divider"></div>
+    <div><div class="stat-num">24</div><div class="stat-label">Unique companies</div></div>
+    <div class="divider"></div>
+    <div><div class="stat-num">59</div><div class="stat-label">Days to first mailer</div></div>
+    <div class="divider"></div>
+    <div><div class="stat-num">24</div><div class="stat-label">Named Rocket Mortgage</div></div>
+    <div class="divider"></div>
+    <div><div class="stat-num">4</div><div class="stat-label">Print operations</div></div>
+  </div>
+  <p class="hero-provenance">Data collected from direct mail received by a single veteran borrower following a January 7, 2025 VA purchase loan closing with Rocket Mortgage in Summit County, Ohio. All companies shown are third-party solicitors with no affiliation to the VA, Rocket Mortgage, or the U.S. government. Borrower information was sourced entirely from public county deed and mortgage recording records — a standard industry practice. Click “View PDF” on any card to see the original mailer.</p>
+</div>
+
+<div class="explainer">
+  <div class="explainer-box">
+    <div class="explainer-title">How did they know?</div>
+    <div class="explainer-body">When a mortgage closes, the deed and loan details are <strong>recorded in public county records</strong> — a legal requirement in every U.S. state. Data aggregators scrape these records continuously and sell the lists to mortgage solicitors within weeks of closing. Every company in this timeline knew the borrower's name, address, loan type, lender, and approximate loan amount — <strong>entirely from public records, with no access to the actual loan file.</strong> The loan closed in Summit County, Ohio.</div>
+    <div class="explainer-cols">
+      <div>
+        <div class="explainer-col-head">Known from public records</div>
+        <ul class="explainer-list">
+          <li>Borrower name and property address</li>
+          <li>Loan type (VA-guaranteed purchase)</li>
+          <li>Lender name (Rocket Mortgage)</li>
+          <li>Approximate loan amount ($232,200)</li>
+          <li>Close date (January 7, 2025)</li>
+          <li>County (Summit County, Ohio)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="explainer-col-head">Coordinated print operations identified</div>
+        <ul class="explainer-list">
+          <li>Sacramento CA Permit #1946 — MVP Funding, AdvantageFirst, Prosperity, Independence, Shield Home Loans</li>
+          <li>Bellmawr NJ Permit #2139 — United Trust Bank, ClearPath Lending</li>
+          <li>Atlanta ZIP 30336 — Denali Funding Group, Equity Express Mortgage, AdvantageFirst, Everett Financial</li>
+          <li>Temecula CA ZIP 92591 Permit #2 — AdvantageFirst, Liberty 1 Lending, Vesta Lending</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--irrrl)"></div>VA IRRRL (20)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--vaclaim)"></div>VA Benefits Claim (11)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cashout)"></div>Cash-Out Refi (10)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--heloc)"></div>HELOC (6)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--other)"></div>Other (2)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--rocket-flag)"></div>Named Rocket Mortgage</div>
+</div>
+
+<div class="controls">
+  <span class="filter-label">Category:</span>
+  <button class="filter-btn active" data-cat="all">All (49)</button>
+  <button class="filter-btn" data-cat="VA IRRRL">VA IRRRL</button>
+  <button class="filter-btn" data-cat="VA Benefits Claim">VA Benefits Claim</button>
+  <button class="filter-btn" data-cat="Cash-Out Refi">Cash-Out Refi</button>
+  <button class="filter-btn" data-cat="HELOC">HELOC</button>
+  <button class="filter-btn" data-cat="Other">Other</button>
+  <button class="filter-btn" data-cat="rocket">⚠ Named Rocket (24)</button>
+</div>
+<div class="controls" style="padding-top:0;margin-top:0">
+  <span class="filter-label">Deception tactic:</span>
+  <button class="filter-btn" data-cat="check">Check format</button>
+  <button class="filter-btn" data-cat="fabricated">Fabricated form numbers</button>
+  <button class="filter-btn" data-cat="govtimp">Govt impersonation</button>
+  <button class="filter-btn" data-cat="falseaff">False affiliation claim</button>
+  <button class="filter-btn" data-cat="printop">Coordinated print op</button>
+</div>
+
+<div class="timeline-wrap" id="timeline"></div>
+
+<div class="findings">
+  <div class="findings-box">
+    <div class="findings-title">Interesting findings</div>
+
+    <div class="finding-item">
+      <div class="finding-num">01</div>
+      <div class="finding-body">
+        <div class="finding-label">Unprecedented document insert</div>
+        <div class="finding-text">Aven included a <strong>"Sample Certificate of Lien"</strong> — a ornate, certificate-styled insert complete with guilloche border and official seal — to normalize the concept of placing a lien on the borrower's home as part of a credit card product. Nothing else in the dataset comes close to this as a document design tactic.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">02</div>
+      <div class="finding-body">
+        <div class="finding-label">Strongest false affiliation claim in the dataset</div>
+        <div class="finding-text"><strong>Denali Funding Group</strong> includes standard non-affiliation language in the letter body — but buried in the fine print disclosure is the statement that the offer is made by a company <strong>"partnered with Rocket Mortgage."</strong> No other mailer in the dataset attempts this. Every other sender disclaimed any connection to the borrower's lender; Denali explicitly asserted one in the same document. The contradiction between the body copy and the fine print is what makes it notable: the disclaimer is present, and the false affiliation claim is also present.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">03</div>
+      <div class="finding-body">
+        <div class="finding-label">Three coordinated print operations confirmed</div>
+        <div class="finding-text">Four fulfillment operations have been identified producing mailers in this dataset. Sacramento CA Permit #1946 served MVP Funding, AdvantageFirst, Prosperity, Independence, and Shield Home Loans. Bellmawr NJ Permit #2139 served United Trust Bank and ClearPath Lending. ZIP 30336 in Atlanta served Denali Funding Group, Equity Express Mortgage, AdvantageFirst, and Everett Financial Group — the Atlanta operation is also responsible for the <strong>"DATED DOCUMENT VERIFICATION REQUESTED"</strong> template used by at least two different companies. A fourth operation at <strong>Temecula CA ZIP 92591 Permit No. 2</strong> served AdvantageFirst, Liberty 1 Lending, and Vesta Lending. Across all four, <strong>at least 14 of the 49 mailers were produced by shared fulfillment infrastructure</strong> serving multiple competing lenders simultaneously.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">04</div>
+      <div class="finding-body">
+        <div class="finding-label">USPS impersonation envelope used by three separate companies</div>
+        <div class="finding-text">The eagle + <strong>"UNITED STATES MAIL"</strong> envelope design — which mimics official USPS postage markings — was used by Prime Choice Funding (Permit #1935), Active Link (Permit #681), and a third sender. Active Link escalated further by printing <strong>"CONFIDENTIAL MATERIALS ENCLOSED"</strong> and <strong>"Re: Rocket Mortgage LLC"</strong> on the exterior of the envelope — visible before the borrower even opened it.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">05</div>
+      <div class="finding-body">
+        <div class="finding-label">The check format — used by two companies</div>
+        <div class="finding-text"><strong>United Trust Bank</strong> formatted their solicitation as a physical check — written-out dollar amount ("TWO HUNDRED FIFTY-SEVEN THOUSAND..."), printed VP signature, perforated edge, and a "VA WAITING PERIOD: COMPLETED" stamp. <strong>MVP Funding</strong> used a similar check-style insert for a smaller fabricated amount ($2,493). Both included "THIS IS NOT A LIVE CHECK" or equivalent — in small print, after the entire design had already done its work.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">06</div>
+      <div class="finding-body">
+        <div class="finding-label">Prosperity Home Mortgage fabricated VA form numbers</div>
+        <div class="finding-text">Prosperity's August 1 mailing cited <strong>"IRRRL-1003 Benefit Allotment"</strong> and <strong>"Form 21-0760 Eligibility Notification"</strong> — neither of which are real VA forms. The actual relevant VA form is 26-0592. The document also instructed the borrower to <strong>"PLEASE KEEP A COPY OF THIS NOTICE FOR YOUR RECORDS"</strong> — standard government document language applied to a private solicitation.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">07</div>
+      <div class="finding-body">
+        <div class="finding-label">SoFi was the least deceptive sender — by a wide margin</div>
+        <div class="finding-text">SoFi sent <strong>four mailers</strong> across the dataset — all using clean, branded fintech design with no government impersonation, no fabricated urgency, and no lender-naming tactics. All four came from the same Carol Stream IL Permit #35. They stand in stark contrast to the rest of the dataset and demonstrate that compliant, straightforward solicitation is entirely possible in this space.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">08</div>
+      <div class="finding-body">
+        <div class="finding-label">Federal mail tampering statute on a private solicitation</div>
+        <div class="finding-text">AdvantageFirst Lending's September 25 mailing printed the full text of <strong>18 U.S.C. § 1702</strong> — the federal mail obstruction law, carrying five years imprisonment — on the face of the letter, alongside <strong>"DATED DOCUMENT VERIFICATION REQUESTED"</strong> and <strong>"CONFIDENTIAL DOCUMENT FOR ADDRESSEE ONLY."</strong> The Atlanta ZIP 30336 operation produced the same "DATED DOCUMENT VERIFICATION" template for Everett Financial Group the following month, confirming this is a template sold to multiple clients.</div>
+      </div>
+    </div>
+
+    <div class="finding-item">
+      <div class="finding-num">09</div>
+      <div class="finding-body">
+        <div class="finding-label">Four coordinated print operations identified — not three</div>
+        <div class="finding-text">A fourth fulfillment operation was confirmed: <strong>Temecula CA ZIP 92591, Permit No. 2</strong>, producing mailings for AdvantageFirst Lending, Liberty 1 Lending, and Vesta Lending. The Atlanta 30336 operation also expanded — it produced the "DATED DOCUMENT VERIFICATION" template for both AdvantageFirst and Everett Financial Group. The Sacramento CA Permit #1946 operation added Shield Home Loans to its client roster. Across all four operations, <strong>at least 14 of the 47 mailers were produced by shared fulfillment infrastructure</strong> serving multiple competing lenders.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <div class="lightbox-header">
+      <span class="lightbox-title" id="lightbox-title"></span>
+      <div class="lightbox-actions">
+        <a class="lightbox-open-btn" id="lightbox-extlink" href="#" target="_blank">Open in Drive ↗</a>
+        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+      </div>
+    </div>
+    <iframe class="lightbox-frame" id="lightbox-frame" src=""></iframe>
+  </div>
+</div>
+
+
+<script>
+const records=[
+{entryId:"2025-03-07-3836",driveId:"1qzUSgDqykuTgt3Gp_t0WYulqbtLT0Ft1",date:"2025-03-07",days:59,company:"Figure Lending",category:"HELOC",headline:"Did you know that 44% of homeowners initially consider a personal loan before realizing the benefits of a home equity line of credit? With a HELOC from Figure Lending, you could tap into the equity you've built in your home. Lines range from $15k-$400k. Plus, you can apply online in 5 minutes with funding in as little as 5 days. And the best part? You're already pre-approved! Offer expires: 3/15/2025",namesRocket:false,flags:[]},
+{entryId:"2025-03-18-4899",driveId:"1MkR6k9ZYP1ztSb099hGeSKeCvOg-oVxq",date:"2025-03-18",days:70,company:"Rocket Card LLC",category:"Credit Card",headline:"With Rocket Card, you can redeem 2% of your spend toward your Rocket Mortgage loan principal, helping you reduce the amount of interest you pay. No need to track categories, every dollar spent earns you points. All Rocket Card LLC cards are powered by Deserve and issued by Celtic Bank. Expires 5/2/2025",namesRocket:true,flags:[]},
+{entryId:"2025-03-28-4716",driveId:"1rOCEfz5UakfZj6yhNPVM-E1EudaEbwiS",date:"2025-03-28",days:80,company:"Achieve",category:"HELOC",headline:"Great news! Based on the estimated equity in your home you're pre-qualified for a HELOC from Achieve Loans! Check your rates today without affecting your credit! Hurry, offer expires 05/12/25. A comparison chart is enclosed.",namesRocket:false,flags:[]},
+{entryId:"2025-06-02-5119",driveId:"1d9TJyD-9bcAZfKN5ZprlSsiLUoY5-Kx8",date:"2025-06-02",days:146,company:"Journey Capital",category:"Debt Consolidation",headline:"Right now you may be buried under a mountain of high-interest credit card debt and crushing monthly payments. But Journey Capital can help you fix that once and for all. You have been pre-selected for a Debt Consolidation Loan of up to $50,000 with an Annual Percentage Rate as low as 4.99%",namesRocket:false,flags:[]},
+{entryId:"2025-06-23-5422",driveId:"1mUrDZVYVT80oMGxTvpB2ATw0rdrUWN1T",date:"2025-06-23",days:167,company:"MVP Funding Mortgage",category:"VA IRRRL",headline:"Your VA loan currently with Rocket Mortgage, has been tagged as eligible for inclusion in our VA IRRRL Program. Your eligibility under this Program can bring your new monthly payment down to $1,246.50 per month, principal and interest. To reserve or accept this limited opportunity you must call MVP Funding Mortgage before August 07, 2025. This Program is limited to only the VA Homeowner listed above and is non-transferable.",namesRocket:true,flags:["printop"]},
+{entryId:"2025-06-28-2400",driveId:"1REfnb6_kLW2DHSJifDzFRdTj2cHFDGnR",date:"2025-06-28",days:172,company:"Oxford Home Lending",category:"VA IRRRL",headline:"Your home loan for your property has been marked for analysis for the VA Interest Rate Reduction Refinance Loan programs that are currently available for Akron, Ohio residents. Oxford Home Lending records indicate that you have not responded to our previous attempts to notify you of your qualification status. It is important that you contact us toll-free before 08/13/2025.",namesRocket:false,flags:["govtimp"]},
+{entryId:"2025-07-01-6666",driveId:"1KAddU31bbN1Ij7zH1vycP_azM2IbMqJj",date:"2025-07-01",days:175,company:"MVP Funding Mortgage",category:"VA IRRRL",headline:"As a Summit County, Ohio resident. Your VA loan currently with Rocket Mortgage has been tagged as eligible for inclusion in our VA IRRRL Program. Your eligibility under this Program can bring your new monthly payment down to $1,246.50 per month, principal and interest. To reserve or accept this limited opportunity you must call our office before August 14, 2025. This Program is limited to only the VA Homeowner listed above and is non-transferable.",namesRocket:true,flags:["printop"]},
+{entryId:"2025-07-07-5700",driveId:"1sogW3wo5yZ7nXEA8dJqAvoCsIW8nY13p",date:"2025-07-07",days:181,company:"MVP Funding Mortgage",category:"VA Benefits Claim",headline:"VA guidelines require a waiting period in Summit County, Ohio, to access certain benefits through your VA guarantee. Our review has indicated that the waiting period has been marked as expired as of August 01, 2025, and that you have not accessed your equity reserves of $2,493 or other loan benefits through Rocket Mortgage. Please call MVP Funding Mortgage by August 21, 2025.",namesRocket:true,flags:["govtimp","printop"]},
+{entryId:"2025-07-15-4760",driveId:"12g3Ue_wgFuU9wY07GCxvwA_hZoeOJnJt",date:"2025-07-15",days:189,company:"Prime Choice Funding",category:"Cash-Out Refi",headline:"You may now be eligible for a new loan program that could allow you to get an additional $50,126 in cash or more for a new monthly principal and interest payment of $1,514 at 4.99% 15.241% APR, 30-year fixed. This estimated payment is for principal and interest only and does not include impounds. It is important you call Prime Choice Funding within 5 days of receiving this notice.",namesRocket:true,flags:["govtimp"]},
+{entryId:"2025-07-25-5085",driveId:"1RRvT_1QvXpJKI4XcjMZUqfgvnWutM587",date:"2025-07-25",days:199,company:"SoFi",category:"HELOC",headline:"You're preselected! Use the equity you've built in your home to get a SoFi Home Equity Loan. Save on interest with a rate as low as 8.99% APR. You can use the funds for almost any expense, including home improvements, big ticket purchases, or consolidating high-rate debt. Enter confirmation before 10/3/2025.",namesRocket:false,flags:[]},
+{entryId:"2025-07-29-4947",driveId:"1HRWLbSJgKMSL7yIngmEv7qqa3SiTzA22",date:"2025-07-29",days:203,company:"AdvantageFirst Lending",category:"VA Benefits Claim",headline:"Our review has indicated that because of homes appreciating in Akron, Ohio you may now qualify for additional benefits through your VA loan. These benefits may include deferring up to two payments, refund of escrow, and up to $29,352 in available funds. Please call AdvantageFirst Lending Program Specialist by September 12, 2025.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-08-01-5232",driveId:"1d1wt8yW4USK0BaQGKO_BqBXjLpPpHTlu",date:"2025-08-01",days:206,company:"AdvantageFirst Lending",category:"Cash-Out Refi",headline:"You can use these cash funds to consolidate high interest rate credit card debt, personal loans or any way you like. Even more money could be available. Call AdvantageFirst Lending.",namesRocket:false,flags:["printop"]},
+{entryId:"2025-08-01-5233",driveId:"1YCueNE2um6LKe-nHWd0hLSUMzx8vjNk3",date:"2025-08-01",days:206,company:"Prosperity Home Mortgage",category:"VA IRRRL",headline:"Your VA-guaranteed loan with Rocket Mortgage has been tagged for inclusion in our VA IRRRL program. Your new principal and interest payment has been calculated at $1,300.25 per month. Payment amount based on 30-year Fixed Rate at 5.375% or 6.280% APR. To reserve or accept this limited opportunity, you must call the Prosperity Home Mortgage office before August 15, 2025.",namesRocket:true,flags:["fabricated","govtimp","printop"]},
+{entryId:"2025-08-06-4401",driveId:"1bbWOIIHSbEGMAAQTMrYb9qxsNDzDfD6N",date:"2025-08-06",days:211,company:"SoFi",category:"HELOC",headline:"SoFi can help you turn the equity you've built in your home into cash. You're preselected for a SoFi Home Equity Loan, so you can request up to $350,000. Offer expires 9/5/2025.",namesRocket:false,flags:[]},
+{entryId:"2025-08-12-5015",driveId:"1rNzNoxPmFC-_UA-VBQ9kkwx5tXs3-STR",date:"2025-08-12",days:217,company:"United Trust Bank",category:"VA Benefits Claim",headline:"Your current home loan with Rocket Mortgage in Summit County, Ohio, has been reviewed and you are eligible to receive up to $257,163 or more in VA-backed funds under the specifications of this U.S. Department of Veteran Affairs program. Expires: 09/26/2025.",namesRocket:true,flags:["check","govtimp"]},
+{entryId:"2025-08-12-5098",driveId:"1QvoYYpzJpcQYOW5b3iTWWj9IYeuT3oQm",date:"2025-08-12",days:217,company:"Vesta Lending",category:"VA IRRRL",headline:"We are contacting you because you qualify for a VA Interest Rate Reduction Mortgage! All you need to do is call to apply for this loan opportunity. Expires: September 26, 2025.",namesRocket:true,flags:["govtimp"]},
+{entryId:"2025-08-15-5166",driveId:"1QvuqkQFPqs4ELmD6p8YD-pTG3I-7lk36",date:"2025-08-15",days:220,company:"AdvantageFirst Lending",category:"VA Benefits Claim",headline:"Our review has indicated that because of homes appreciating in Akron, Ohio, you may now qualify for additional benefits through your VA loan. These benefits may include deferring up to two payments, refund of escrow, and up to $29,571 in available funds. Please call AdvantageFirst Lending by September 05, 2025.",namesRocket:false,flags:["printop"]},
+{entryId:"2025-08-18-4349",driveId:"1pzZrlRiyHER9RUTRQknN3cs28fkqCYPV",date:"2025-08-18",days:223,company:"United Trust Bank",category:"VA Benefits Claim",headline:"Among the most important promises to veterans is to give them easier access to the equity in their home. Your current home loan has been reviewed and you are eligible to receive up to $257,163 or more in VA backed funds. EXPIRES: 09/16/2025. Note: this mailing contains a template error — it references Prosperity Mortgage in Anne Arundel County instead of the correct lender and county.",namesRocket:false,flags:["check","govtimp"]},
+{entryId:"2025-08-18-4383",driveId:"15yKcJRc5pHjvGLh99VJ6E-iy1Tzg87aK",date:"2025-08-18",days:223,company:"Prime Choice Funding",category:"Cash-Out Refi",headline:"You may now be eligible for a new loan program that could allow you to get an additional $50,126 in cash or more for a new monthly principal and interest payment of $1,516 at 5% or 5.503% APR, 30 year fixed. It is important you call toll free Prime Choice Funding within 5 days of receiving this notice.",namesRocket:true,flags:["govtimp"]},
+{entryId:"2025-08-18-4487",driveId:"1p1iAnQmn4gZajqq-xRf1fMVRs58Ft98V",date:"2025-08-18",days:223,company:"ClearPath Lending",category:"VA IRRRL",headline:"Call ClearPath Lending regarding your Veterans Administration Loan. Your mortgage may now be eligible for a 30-year fixed interest rate of 5.25% Rate 5.427% APR with an estimated payment of $1,282.22 30-Year Fixed Rate Loan.",namesRocket:false,flags:[]},
+{entryId:"2025-08-18-4549",driveId:"1zLb27USwSAj-XXY8WxNoWnsbsXTWAxIu",date:"2025-08-18",days:223,company:"Prosperity Home Mortgage",category:"VA IRRRL",headline:"Your VA loan currently with Rocket Mortgage has been tagged as eligible for inclusion in our VA IRRRL Program. Your eligibility under this program can bring your new monthly payment down to $1,300.25 per month, principal and interest. To reserve or accept this limited opportunity you must call Prosperity Home Mortgage office before August 22, 2025.",namesRocket:true,flags:["govtimp","printop"]},
+{entryId:"2025-08-18-4557",driveId:"1WlubQkGWxnG3dnSuOKRXUCGYHCY4It-W",date:"2025-08-18",days:223,company:"ClearPath Lending",category:"VA IRRRL",headline:"Your Veterans Administration loan may now be eligible for the VA IRRRL Streamline through ClearPath Lending. The 30-year fixed rate today is as low as 5.25% Rate 5.427% APR, which could lower your payment to an estimated $1,282.22, 30 Year Fixed Rate Loan.",namesRocket:false,flags:[]},
+{entryId:"2025-08-18-4566",driveId:"1v5fzr9Hpy2ADJ9tCeuHynZTRxN0NFw0c",date:"2025-08-18",days:223,company:"ClearPath Lending",category:"VA IRRRL",headline:"Your home loan for your property may be eligible for a loan guaranteed by the Veterans Administration. VA homeowners may be able to refinance into a new rate and payment through ClearPath Lending.",namesRocket:false,flags:[]},
+{entryId:"2025-08-20-5036",driveId:"1QbVGe5RDdaki3puTiCUuHZ0xQAtXGHBZ",date:"2025-08-20",days:225,company:"MVP Funding Mortgage",category:"VA Benefits Claim",headline:"Guidelines require a waiting period in Akron, Ohio, to access certain benefits through your loan. Our review has indicated that the waiting period has been marked as expired as of August 01, 2025 and that you have not accessed your reserves of $2,493 or other loan benefits through Rocket Mortgage. Please call our representatives at MVP Funding Mortgage by August 28, 2025.",namesRocket:true,flags:["govtimp","printop"]},
+{entryId:"2025-08-21-4810",driveId:"1NwAu2WnMs_4FBXOp4qS7eXh6uRxWt2V2",date:"2025-08-21",days:226,company:"AdvantageFirst Lending",category:"Cash-Out Refi",headline:"You can use these cash funds to consolidate high interest rate credit card debt, personal loans or any way you like. Even more money could be available. Call AdvantageFirst Lending.",namesRocket:false,flags:["printop"]},
+{entryId:"2025-08-21-5390",driveId:"1Lq2OvLm4UB24sfVQvxYFZDfbI2SN5kcu",date:"2025-08-21",days:226,company:"Texana Bank",category:"VA Benefits Claim",headline:"We are contacting you regarding your $232,200 VA loan. Our review has indicated that because of homes appreciating in Akron, Ohio, you may now qualify for additional benefits. Call Texana Bank by September 5, 2025.",namesRocket:false,flags:[]},
+{entryId:"2025-08-29-4129",driveId:"1JgDt3wRwd_Fs62eDUAZgFCGuDmCa_GP-",date:"2025-08-29",days:234,company:"Aven",category:"HELOC",headline:"With Aven, you can use the value of your home's equity to keep your same monthly payments while enjoying extra cash. The Aven Visa Credit Card is issued by Coastal Community Bank. Includes a Sample Certificate of Lien insert styled as an official legal document to normalize placing a lien on the home.",namesRocket:false,flags:[]},
+{entryId:"2025-08-29-4171",driveId:"1xpoPGKgiDXZKL4y4JNsdbHKjdaULdVZl",date:"2025-08-29",days:234,company:"Prime Choice Funding",category:"Cash-Out Refi",headline:"You may now be eligible for a new loan program that could allow you to get an additional $50,126 in cash or more for a new monthly principal and interest payment of $1,516 at 5% or 5.503% APR, 30-year fixed. It is important you call Prime Choice Funding within 5 days of receiving this notice.",namesRocket:false,flags:["govtimp"]},
+{entryId:"2025-08-29-4176",driveId:"1FAeb5UOPGwmndOJ58-fgOq8VEhbuQFWF",date:"2025-08-29",days:234,company:"Denali Funding Group",category:"VA IRRRL",headline:"The Federal Reserve has begun lowering interest rates for the first time since March 2020, and your VA loan has been flagged under this special program and notification is being sent on 8/21/2025. Under the specifications of this new program, your new payment has been calculated at $1,243.64 per month. Fine print states offer is made by a company partnered with Rocket Mortgage — a direct false affiliation claim.",namesRocket:true,flags:["falseaff","govtimp"]},
+{entryId:"2025-09-24-4287",driveId:"1pyeUMzjPXkdDleh_FiJNZV464JvVoF0V",date:"2025-09-24",days:260,company:"Independence Home Loans LLC",category:"VA Benefits Claim",headline:"FUNDING NOTICE FOR [borrower]. This letter is to inform you of a change to your current economic status. The status has changed because of the following activity. NEW FUNDING AMOUNT: $2,781.32. As a result of your new funding amount your status has changed. You could qualify for more funding through your updated status if you call. Call Independence Home Loans LLC for complete funding status details.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-09-24-4764",driveId:"1va3EyTybYJNzjXYyW6uk2kFY42PvOR-E",date:"2025-09-24",days:260,company:"Active Link, Inc",category:"VA IRRRL",headline:"NOTICE: You have completed your waiting period and you may now be able to access your VA Mortgage options including VA Interest Rate Reduction and/or possible equity reserves of $41,796.00. Envelope exterior: eagle + UNITED STATES MAIL (Permit #681), CONFIDENTIAL MATERIALS ENCLOSED, and Re: Rocket Mortgage LLC printed before opening. Options include rate reduction, defer up to two monthly mortgage payments, escrow refund. Please call Active Link, Inc before October 11, 2025.",namesRocket:true,flags:["govtimp","falseaff"]},
+{entryId:"2025-09-25-4683",driveId:"1ScMnSVQEDbAs4hDiOyMFibgdNTMCUK0W",date:"2025-09-25",days:261,company:"United Trust Bank",category:"VA Benefits Claim",headline:"Build Financial Strength and Stability. You may be eligible to access up to $257,163 or more in VA-backed funds. Now it's time to put the benefits you've earned to work for you and your family. Proud Sponsor of Folds of Honor. You've already laid the foundation. Now let's work together to establish the financial stability you deserve. Expires by 10/03/2025.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-09-25-4688",driveId:"1pDBTXyqhUmpVXGZU0_S2qlxAeeUt3di5",date:"2025-09-25",days:261,company:"Prime Choice Funding",category:"Cash-Out Refi",headline:"RE: ROCKET MORTGAGE LLC. You may now be eligible for a new loan program that could allow you to get an additional $50,126 in cash or more for a new monthly principal and interest payment of $1,514 at 4.99% or 5.324% APR, 30-year fixed. Envelope: UNITED STATES MAIL eagle cancellation Permit #1935. It is important you call toll free Prime Choice Funding within 5 days of receiving this notice.",namesRocket:true,flags:["govtimp","falseaff"]},
+{entryId:"2025-09-25-5423",driveId:"1nrjHjXW2IvWwRxo02OyVUbfH7CNZjOIO",date:"2025-09-25",days:261,company:"Equity Express Mortgage, LLC",category:"VA IRRRL",headline:"VA BENEFIT STATEMENT. Re: ROCKET MORTGAGE. The Federal Reserve has begun lowering interest rates for the first time since March 2020, and your VA loan has been flagged under this special program and NOTIFICATION is being sent on September 11, 2025. PLEASE KEEP A COPY OF THIS NOTICE FOR YOUR RECORDS. Under the specifications of this new program, your new payment has been calculated at $1,261.39 per month. To accept this reduced rate you must call within 5 days of receipt.",namesRocket:true,flags:["govtimp","falseaff","printop"]},
+{entryId:"2025-09-29-4280",driveId:"1NFebKuWYCPYguzT8HL0NRLqzbuuZJhFk",date:"2025-09-29",days:265,company:"SoFi",category:"HELOC",headline:"SoFi can help you turn the equity you've built in your home into cash. You're preselected for a SoFi Home Equity Loan, so you can request up to $350,000. Offer expires 11/05/2025.",namesRocket:false,flags:[]},
+{entryId:"2025-09-30-3765",driveId:"1xJUsweeYl9NsFj8UN4YJxofVuZ3-h39z",date:"2025-09-30",days:266,company:"AdvantageFirst Lending",category:"Cash-Out Refi",headline:"UPDATE: Your Home Savings Program. Current Lender: Rocket Mortgage. Our review indicates your loan has been identified as eligible for our savings program. You may now be eligible to get $46,000 in cash or more for a new monthly principal and interest payment of $1,529.60 at 5.250% or 5.990% APR, 30-year fixed rate. PLEASE KEEP A COPY OF THIS NOTICE FOR YOUR RECORDS. Call our office before October 03, 2025.",namesRocket:true,flags:["falseaff","printop"]},
+{entryId:"2025-09-30-4681",driveId:"1j7mnkx-veYqdV-jTrsY743CntVEPX3rr",date:"2025-09-30",days:266,company:"AdvantageFirst Lending",category:"VA IRRRL",headline:"DATED DOCUMENT VERIFICATION REQUESTED. CONFIDENTIAL DOCUMENT FOR ADDRESSEE ONLY — Five years imprisonment or $2,000 fine or both for any person tampering with or obstructing the delivery of this document. US CODE TITLE 18, SEC 1702. Per VA loan eligibility, we are contacting you with details on September 25, 2025. As an eligible Veteran and due to very favorable market conditions during the week of September 22, 2025, by taking quick action you may now benefit from a significantly lower interest rate. New Payment: $1,225.87.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-09-30-4838",driveId:"1FIuxCtla551UEr69pTku8RxKig-akBzD",date:"2025-09-30",days:266,company:"Independence Home Loans LLC",category:"VA Benefits Claim",headline:"FUNDING NOTICE FOR [borrower]. This letter is to inform you of a change to your current economic status. The status has changed because of the following activity. NEW FUNDING AMOUNT: $2,781.32. As a result of your new funding amount your status has changed. You could qualify for more funding through your updated status if you call. Third mailing of this template from Independence Home Loans — identical government-ledger format.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-09-30-6044",driveId:"12lIVFyXXZ1RvKQuaLq-Iunz9xzuxEBJ-",date:"2025-09-30",days:266,company:"AdvantageFirst Lending",category:"Cash-Out Refi",headline:"Re: ROCKET MORTGAGE LLC. Your home loan has been flagged for this HOMEOWNER ADVANTAGE PROGRAM and NOTIFICATION is being sent on October 16, 2025. Under the specifications of this VA program your $230,318 mortgage may have a new monthly payment of $1,201.45. Estimated Escrow Refund Amount: $1,973.70. Offer from AdvantageFirst Lending expires: November 14, 2025.",namesRocket:true,flags:["govtimp","falseaff"]},
+{entryId:"2025-10-15-4504",driveId:"19EuttP1bRSo2oVNqDRm5a82vpUA6UbDm",date:"2025-10-15",days:281,company:"Shield Home Loans Inc",category:"VA IRRRL",headline:"UNDERSTANDING YOUR VA BENEFITS. VA Benefits Program — County: Summit County — Current Lender: Rocket Mortgage. PLEASE KEEP A COPY OF THIS NOTICE FOR YOUR RECORDS. Your VA loan currently with Rocket Mortgage has been tagged as eligible for inclusion in our VA IRRRL Program. Your eligibility can bring your new monthly payment down to $1,245.08 per month. To reserve or accept this limited opportunity you must call our office before October 23, 2025.",namesRocket:true,flags:["govtimp","falseaff","printop"]},
+{entryId:"2025-10-15-4546",driveId:"1BR0gNhSO-JxhCTD-rpdZEnt4JFd3WG4i",date:"2025-10-15",days:281,company:"Independence Home Loans LLC",category:"VA Benefits Claim",headline:"2025 EXPIRATION NOTICE. OUR REVIEW OF YOUR VA LOAN HAS INDICATED THAT YOUR WAITING PERIOD HAS BEEN MARKED AS EXPIRED AS OF OCTOBER 2025. Form-style grid: Evaluation Month: October; County: Summit County; Requirements: VA Loan Waiting Period Complete; Equity Reserves: $2,781.32. PLEASE KEEP FOR YOUR RECORDS. THIS IS THE ONLY COPY OF THIS FORM AVAILABLE. Please call before October 16, 2025.",namesRocket:false,flags:["govtimp","printop"]},
+{entryId:"2025-10-15-4640",driveId:"1DyH8JNdmSNy77WWnuePXJgD_nZ5udm1r",date:"2025-10-15",days:281,company:"Liberty 1 Lending",category:"VA IRRRL",headline:"VA INTEREST RATE REDUCTION NOTIFICATION. RE: Rocket Mortgage LLC. We are contacting you because you may now qualify for additional benefits through your VA loan. These benefits could reduce the interest rate on our estimate of your current loan of $232,200. New Monthly Payment: $1,211.27. Or receive up to $23,220 for an additional $121.13 per month. P.S. Loans funded by October might not have a payment until December 2025.",namesRocket:true,flags:["govtimp","falseaff"]},
+{entryId:"2025-10-15-4641",driveId:"1-TtxauiwSTp8KTJFMqAJRpa7DDPMd0x6",date:"2025-10-15",days:281,company:"ClearPath Lending",category:"VA IRRRL",headline:"Your home loan for your property may be eligible for a loan guaranteed by the Veterans Administration. VA homeowners may be able to refinance into a new rate and payment through ClearPath Lending. New estimated monthly payment: $1,282.22, 30-year fixed at 5.25% Rate / 5.427% APR. Mortgage Payment Schedule shows August and September payments as $0.00 Deferred.",namesRocket:false,flags:["printop"]},
+{entryId:"2025-10-15-4950",driveId:"1WMb5uhiKVOEQRoP4JJTh4cJG1jt7eQl5",date:"2025-10-15",days:281,company:"Vesta Lending",category:"VA IRRRL",headline:"RE: ROCKET MORTGAGE LLC. We are contacting you because you qualify for a VA Interest Rate Reduction Mortgage! These benefits could reduce the interest rate on our estimate of your current loan of $232,200. New Monthly Payment: $1,282.22. Or take $20,000 cash-out for an additional $110.44 per month. MORTGAGE GUARANTEED BY THE VETERANS ADMINISTRATION. Expires: November 5, 2025.",namesRocket:true,flags:["govtimp","falseaff","printop"]},
+{entryId:"2025-10-30-4939",driveId:"138oeBbAPLvac-rizbC9I-zexYZqDb6ZV",date:"2025-10-30",days:296,company:"1st Rate Home Mortgage, Inc",category:"VA IRRRL",headline:"RE: Your Loan Date 1/7/2025. Your Loan Amount: $232,200.00. Original Lender: Rocket Mortgage Llc. You have had your VA mortgage for more than 6 months. This qualifies you for VA benefits that allow you to reduce your monthly payment without having to re-qualify. VA rates have come down since your loan closing on 1/7/2025. Includes a reverse letter warning veterans about misleading mailers and citing the VA's Warning Order. Envelope: UNITED STATES MAIL eagle cancellation Permit #1935, PRESORTED FIRST CLASS — only First Class mailer in dataset.",namesRocket:true,flags:["govtimp","falseaff"]},
+{entryId:"2025-10-31-5987",driveId:"1if0j_yYNRFXnysPIC-cX0SCU3hbA8yOh",date:"2025-10-31",days:297,company:"Everett Financial Group",category:"Cash-Out Refi",headline:"DATED DOCUMENT VERIFICATION REQUESTED. Re: Rocket Mortgage. RE: Important Information Regarding § 36.4307 VA Interest Rate Reduction Refinancing Loan (IRRRL). Pursuant to 38 U.S.C. 3710(a)(8)... NOTICE OF LOWER INTEREST RATE. Under the specifications of this program your $235,000 VA mortgage would have a new monthly payment of $1,225.87 or less. Your loan has been identified for this program. Financing is also available for homeowners with damaged credit.",namesRocket:true,flags:["govtimp","falseaff","printop"]},
+{entryId:"2025-10-31-5996",driveId:"1VcguJaKlcibD0BmJVFEztfpptkq59hxT",date:"2025-10-31",days:297,company:"Shield Home Loans Inc",category:"VA IRRRL",headline:"IRRRL-1003 Benefit Allotment / Form 21-0760 Eligibility Notification / Current Lender: Rocket Mortgage. UNDERSTANDING YOUR VA IRRRL BENEFIT STATEMENT. PLEASE KEEP A COPY OF THIS NOTICE FOR YOUR RECORDS. Your VA-guaranteed loan with Rocket Mortgage has been tagged for inclusion in our VA IRRRL program. Your new principal and interest payment has been calculated at $1,245.08 per month. Call before November 06, 2025.",namesRocket:true,flags:["fabricated","govtimp","falseaff","printop"]},
+{entryId:"2025-11-08-3104",driveId:"1HpxlxD4VK0E5pEEOjaynI4O2HEnutim5",date:"2025-11-08",days:305,company:"Vesta Lending",category:"VA IRRRL",headline:"RE: ROCKET MORTGAGE LLC. We are contacting you because you qualify for a VA Interest Rate Reduction Mortgage from Vesta Lending. New Monthly Payment: $1,228.82. Or take $20,000 cash-out for an additional $105.84 per month. MORTGAGE GUARANTEED BY THE VETERANS ADMINISTRATION. Expires: December 23, 2025.",namesRocket:true,flags:["govtimp","falseaff","printop"]},
+{entryId:"2025-11-21-4865",driveId:"1C29JGznRDSUDSwVZ6lqBFVx2IwMuPPv2",date:"2025-11-21",days:318,company:"E Mortgage Capital, Inc",category:"Cash-Out Refi",headline:"VA Eligibility. You have met VA's mandatory waiting period based on when you acquired your loan on 1/7/2025. Your property is pre-qualified for a VA Cash-Out Refinance. New payment could be as low as $1,198 at 4.75% (4.99% APR, 30-year fixed). Available Cash Out: $48,584. First mortgage payment starts in February 2026. Includes a check-format insert: PAY UP TO Forty-Eight Thousand Five Hundred Eighty-Four Dollars / $48,584. THIS IS NOT A CHECK. Orange envelope, Sacramento CA Permit #1935.",namesRocket:false,flags:["check","govtimp"]}
+];
+
+const flagLabels={check:"check format",fabricated:"fabricated form #s",govtimp:"govt impersonation",falseaff:"false affiliation",printop:"coordinated print op"};
+const flagClasses={check:"dflag-check",fabricated:"dflag-fabricated",govtimp:"dflag-govtimp",falseaff:"dflag-falseaff",printop:"dflag-printop"};
+
+function getMonthKey(d){const dt=new Date(d+'T12:00:00');return dt.toLocaleString('en-US',{month:'long',year:'numeric'})}
+function getMonthOrder(d){const dt=new Date(d+'T12:00:00');return dt.getFullYear()*100+dt.getMonth()}
+
+function openMailer(driveId,title){
+  document.getElementById('lightbox-title').textContent=title;
+  document.getElementById('lightbox-frame').src='https://drive.google.com/file/d/'+driveId+'/preview';
+  document.getElementById('lightbox-extlink').href='https://drive.google.com/file/d/'+driveId+'/view';
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-frame').src='';
+  document.body.style.overflow='';
+}
+
+document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLightbox();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+
+function renderTimeline(filter){
+  const wrap=document.getElementById('timeline');
+  wrap.innerHTML='';
+  let filtered;
+  if(filter==='all') filtered=records;
+  else if(filter==='rocket') filtered=records.filter(r=>r.namesRocket);
+  else if(filter==='Other') filtered=records.filter(r=>!['VA IRRRL','VA Benefits Claim','Cash-Out Refi','HELOC'].includes(r.category));
+  else if(['check','fabricated','govtimp','falseaff','printop'].includes(filter)) filtered=records.filter(r=>r.flags.includes(filter));
+  else filtered=records.filter(r=>r.category===filter);
+
+  document.getElementById('stat-total').textContent=filtered.length;
+
+  const months={};
+  filtered.forEach(r=>{
+    const mk=getMonthKey(r.date);
+    const mo=getMonthOrder(r.date);
+    if(!months[mk]) months[mk]={order:mo,records:[]};
+    months[mk].records.push(r);
+  });
+
+  Object.entries(months).sort((a,b)=>a[1].order-b[1].order).forEach(([month,{records:mrs}])=>{
+    const group=document.createElement('div');
+    group.className='month-group';
+    const header=document.createElement('div');
+    header.className='month-header';
+    header.innerHTML=`<span class="month-label">${month}</span><div class="month-line"></div><span class="month-count">${mrs.length} mailer${mrs.length!==1?'s':''}</span>`;
+    group.appendChild(header);
+    const grid=document.createElement('div');
+    grid.className='cards-grid';
+    mrs.forEach(r=>{
+      const uid=Math.random().toString(36).slice(2,8);
+      const card=document.createElement('div');
+      card.className='mailer-card'+(r.namesRocket?' names-rocket':'');
+      card.setAttribute('data-cat',r.category);
+      let flagsHtml='';
+      if(r.flags.length) flagsHtml='<div class="deception-flags">'+r.flags.map(f=>`<span class="dflag ${flagClasses[f]}">${flagLabels[f]}</span>`).join('')+'</div>';
+      const safeTitle=(r.company+' \u2014 '+r.date).replace(/'/g,"\\'");
+      card.innerHTML=`
+        <div class="card-top">
+          <div class="card-company">${r.company}</div>
+          <div class="card-day">Day ${r.days}</div>
+        </div>
+        ${r.namesRocket?'<div class="rocket-flag-badge">Names Rocket Mortgage</div>':''}
+        <div class="card-cat">${r.category}</div>
+        ${flagsHtml}
+        <div class="card-headline" id="hl-${uid}">${r.headline}</div>
+        <div class="card-actions">
+          <button class="card-expand" onclick="(function(btn){var hl=document.getElementById('hl-${uid}');hl.classList.toggle('expanded');btn.textContent=hl.classList.contains('expanded')?'Show less':'Read more';})(this)">Read more</button>
+          <button class="card-pdf" onclick="openMailer('${r.driveId}','${safeTitle}')">📄 View PDF</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+    group.appendChild(grid);
+    wrap.appendChild(group);
+  });
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTimeline(btn.dataset.cat);
+  });
+});
+
+renderTimeline('all');
+</script>
+</body>
+</html>
